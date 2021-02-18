@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .models import Dragon, Toy
+from .forms import FeedingForm
 
 
 def home(request):
@@ -15,7 +16,21 @@ def dragons_index(request):
 
 def dragons_detail(request, dragon_id):
     dragon = Dragon.objects.get(id=dragon_id)
-    return render(request, 'dragons/detail.html', {'dragon': dragon})
+    feeding_form = FeedingForm()
+    return render(request, 'dragons/detail.html',
+    {'dragon': dragon, 'feeding_form': feeding_form})
+
+def add_feeding(request, dragon_id):
+    # create the ModelForm using the data in request.POST
+    form = FeedingForm(request.POST)
+    # validate the form
+    if form.is_valid():
+        # don't save the form to the db until it has the dragon_id assigned
+        new_feeding = form.save(commit=False)
+        # Attach the dragon_id to the feeding BEFORE saving it to the db
+        new_feeding.dragon_id = dragon_id
+        new_feeding.save()
+    return redirect('dragons_detail', dragon_id=dragon_id)
 
 class DragonCreate(CreateView):
     model = Dragon
