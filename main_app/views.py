@@ -138,6 +138,11 @@ def assoc_toy(request, dragon_id, toy_id):
     Dragon.objects.get(id=dragon_id).toys.add(toy_id)
     return redirect('dragons_detail', dragon_id=dragon_id)
 
+@login_required
+def unassoc_toy(request, dragon_id, toy_id):
+    Dragon.objects.get(id=dragon_id).toys.remove(toy_id)
+    return redirect('dragons_detail', dragon_id=dragon_id)
+
 def toys_index(request):
     toys = Toy.objects.all()
     return render(request, 'toys/index.html', {'toys': toys })
