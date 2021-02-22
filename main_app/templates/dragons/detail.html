@@ -21,6 +21,31 @@
         <a href="{% url 'dragons_delete' dragon.id %}">Delete</a>
       </div>
     </div>
+
+    <!-- Display the dragon photos-->
+    {% for photo in dragon.photo_set.all %}
+      <img src="{{ photo.url }}" alt="{{ photo.url }}" class="responsive-img card-panel">
+    {% empty %}
+      <div class="card-panel teal-text center-align">
+        No Photos Uploaded
+      </div>
+    {% endfor %}
+
+    <!-- Add photo form-->
+    <form 
+      action="{% url 'add_photo' dragon.id %}"
+      enctype="multipart/form-data"
+      method="POST"
+      class="card-panel">
+      {% csrf_token %}
+
+      <input type="file" name="photo_file">
+      <br><br>
+      <input type="submit" class="btn" value="Upload Photo">
+    </form>
+
+
+
   </div>
   <div class="col s6">
     <form action="{% url 'add_feeding' dragon.id %}" method="POST">
@@ -41,6 +66,53 @@
         {% endfor %}
       </tbody>
     </table>
+  </div>
+</div>
+
+<hr>
+<div class="row">
+  <div class="col s6">
+    <h3>{{ dragon.name }}'s Toys:</h3>
+    {% if dragon.toys.count %}
+      {% for toy in dragon.toys.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span style="color: {{ toy.color }}">
+              {{ toy.color }}</span> {{ toy.name }}
+            </span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>No toys :(</h5>
+      <p>Go add some now!</p>
+    {% endif %}
+  </div>
+
+  <div class="col s6">
+    <h3>Available Toys</h3>
+    {% if available_toys.count %}
+      {% for toy in available_toys.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span style="color: {{ toy.color }}">
+                {{ toy.color }}</span> {{ toy.name }}
+            </span>
+          </div>
+
+          <div class="card-action">
+            <form action="{% url 'assoc_toy' dragon.id toy.id %}" method="POST">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+      {% else %}
+      <h5>{{ dragon.name }} already has all toys available</h5>
+    {% endif %}
   </div>
 </div>
 
